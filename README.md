@@ -7,18 +7,6 @@ Caching solution for functions that operate on the file system.
 `pip install <path to repository>`
 
 
-## Command line usage
-
-```
-cacherun expensive_script arg1 arg2 ...
-```
-
-When `fscacher` is called, a list of subdirectories of the current directory is
-obtained. If there is a subdirectory matching the function call, nothing
-happens. Otherwise, the subdirectory is created and the script
-`expensive_script` is executed within the newly created directory.
-
-
 ## Usage
 
 Simple usage: 
