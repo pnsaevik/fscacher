@@ -25,6 +25,7 @@ class Cache:
                 dump(result, path)
             return load(path)
 
+        cached_func.key = lambda *args, **kwargs: key(func, args, kwargs)
         return cached_func
 
     def _interpret_options(self, key, dump, load, digest, protocol):
