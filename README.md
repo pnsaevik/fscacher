@@ -31,15 +31,16 @@ Optional arguments to `memoize` include:
     value for serializing the result of `expensive_fn`
 -   `load`: Function with arguments `(filename, )` for de-serializing the
     binary data on disk as a return value
--   `hash`: Function with arguments `(stream, )` and return value of type `str`
+-   `digest`: Function with arguments `(stream, )` and return value of type `str`
     for digesting function call signature as well as the contents of serialized
     files
--   `protocol`: Use predefined functions for `key`, `dump`, `load` and `hash`.
+-   `protocol`: Use predefined functions for `key`, `dump`, `load` and `digest`.
     A list of known protocol schemes are presented below. If both protocol and
     explicit functions are set, the explicit functions takes presedence.
     
-If any of the arguments `key`, `dump`, `load` or `hash` are set to `"default"`,
-the functions defined by the `cache.defaults` dict are used instead.
+If any of the arguments `key`, `dump`, `load` or `digest` are set to
+`"default"`, the functions defined by the `cache.defaults` dict are used
+instead.
 
 Default key function returns a string starting with the function name, followed
 by an space-separated argument list. Arguments are converted to string by
@@ -47,11 +48,11 @@ the `str` function. Numpy arrays are converted to lists before conversion.
 Keyword arguments are presented as `k=v` where `k` is the key and `v` is the
 value. If the resulting string is too long (>200) or contain invalid characters
 (`\/:*?"<>|`) or is non-parsable (spaces or `=` within arguments), it is utf-8
-encoded and converted to a hash.  
+encoded and converted to a sha256 hash.  
 
 Default dump and load functions are from the python pickle module.
 
-Default hash function is based on sha256 from the hashlib module.
+Default digest function is based on sha256 from the hashlib module.
 
 Implemented protocols include:
 -   `filename/<suffix>`: Return value is interpreted as the name of a temporary

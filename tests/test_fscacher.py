@@ -16,7 +16,7 @@ class Test_Cache:
             return 'testfile.txt'
 
         cache = fscacher.Cache('.')
-        memfn = cache.memoize(fn)
+        memfn = cache.memoize(fn, protocol='filename')
         new_fname = memfn()
 
         assert str(new_fname) != 'testfile.txt'
@@ -38,7 +38,7 @@ class Test_Cache:
             return 'testfile.txt'
 
         cache = fscacher.Cache('.')
-        memfn = cache.memoize(fn)
+        memfn = cache.memoize(fn, protocol='filename')
 
         fname = memfn()
 
@@ -56,31 +56,11 @@ class Test_Cache:
             return 'testfile.txt'
 
         cache = fscacher.Cache('.')
-        memfn = cache.memoize(fn, '.txt')
+        memfn = cache.memoize(fn, protocol='filename/.txt')
         fname = memfn('hello', b=1.0)
         unlink(fname)
 
-        assert str(fname) == "fn_hello_b=1.0.txt"
-
-    def test_file_param_names_are_converted_to_hashed_basename(self):
-        def fn(_):
-            with open('testfile.txt', 'w') as f:
-                f.write("Hello")
-            return 'testfile.txt'
-
-        import pathlib
-        import os
-
-        cache = fscacher.Cache('.')
-        memfn = cache.memoize(fn)
-
-        fname_1 = memfn(pathlib.Path('nofile.txt'))
-        unlink(fname_1)
-        fname_2 = memfn(pathlib.Path(os.path.abspath('nofile.txt')))
-        unlink(fname_2)
-
-        assert str(fname_1) == "fn_@4895ac421ec60ef4"
-        assert str(fname_2) == str(fname_1)
+        assert str(fname) == "fn hello b=1.0.txt"
 
     def test_accepts_directory_as_return_value(self):
         def fn():
@@ -91,7 +71,7 @@ class Test_Cache:
             return './testdir'
 
         cache = fscacher.Cache('.')
-        memfn = cache.memoize(fn)
+        memfn = cache.memoize(fn, protocol='filename')
         dirname = memfn()
 
         try:
@@ -103,34 +83,3 @@ class Test_Cache:
             for fname in list(dirname.iterdir()):
                 unlink(fname)
             dirname.rmdir()
-
-    def test_can_use_file_contents_as_key(self):
-        def fn(_):
-            with open('testfile.txt', 'w') as f:
-                f.write("Hello")
-            return 'testfile.txt'
-
-        from pathlib import Path
-
-        d1 = Path('data1.txt')
-        d2 = Path('data2.txt')
-        d3 = Path('data3.txt')
-
-        with open(d1, 'w') as f1, open(d2, 'w') as f2, open(d3, 'w') as f3:
-            f1.write("Test")
-            f2.write("Test")
-            f3.write("Nothing")
-
-        cache = fscacher.Cache('.')
-        memfn = cache.memoize(fn, contents=True)
-
-        fname1 = memfn(d1)
-        fname2 = memfn(d2)
-        fname3 = memfn(d3)
-
-        try:
-            assert fname1 == fname2
-            assert fname1 != fname3
-        finally:
-            for f in [d1, d2, d3, fname1, fname2, fname3]:
-                unlink(f)
