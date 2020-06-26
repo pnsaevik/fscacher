@@ -12,6 +12,9 @@ class Cache:
             digest=_default_digest,
         )
 
+    def __contains__(self, item):
+        return self.path.joinpath(str(item)).exists()
+
     def memoize(self, func, key='default', dump='default', load='default',
                 digest='default', protocol=None):
 
