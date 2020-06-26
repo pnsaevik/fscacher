@@ -52,7 +52,7 @@ class Cache:
                 suffix = ""
             funcs['key'] = lambda f, a, kw: defkey(f, a, kw) + suffix
             funcs['dump'] = shutil.move
-            funcs['load'] = lambda p: Path(p)
+            funcs['load'] = lambda p: str(p)
 
         return funcs['key'], funcs['dump'], funcs['load'], funcs['digest']
 

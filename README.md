@@ -63,8 +63,7 @@ Implemented protocols include:
 -   `filename/<suffix>`: Return value is interpreted as the name of a temporary
     file, which should have the suffix `<suffix>`, including any leading dot.
     `key` is default key, except that `<suffix>` is appended. `dump` moves the
-    file to the index location. `load` returns the file name as a `pathlib`
-    path.
+    file to the index location. `load` returns the file name as a string.
 -   `filehash/<suffix>`: Return value is interpreted as the name of a temporary
     file, which should have the suffix `<suffix>`, including any leading dot.
     `key` is default key with the suffix `.hash` appended. `dump` computes the
