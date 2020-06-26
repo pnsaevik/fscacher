@@ -67,7 +67,7 @@ def _default_key(func, args, kwargs):
         ostr = str(o)
 
         # Hashconvert if too long or contains invalid chars
-        if len(ostr) > 16 or re.search(r'[\\/:*?"<>| =]', ostr):
+        if len(ostr) > 22 or re.search(r'[\\/:*?"<>| =]', ostr):
             ostr = sha256(ostr, 64)
         return ostr
 

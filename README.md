@@ -46,7 +46,7 @@ Default key function is constructed as follows:
 1.  Arguments and keyword arguments (both keys and values) are converted to
     string by the `str` function. Numpy arrays are converted to lists before
     conversion.
-2.  Any arguments which are too long (> 16 chars) or contain invalid characters
+2.  Any arguments which are too long (> 22 chars) or contain invalid characters
     (`= \/:*?"<>|`) are utf-8 encoded and converted to a 64-bit truncated
     sha256 hash.
 3.  Keyword arguments are joined as key-value pairs of the form `k=v`.
