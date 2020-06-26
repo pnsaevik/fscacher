@@ -42,17 +42,22 @@ If any of the arguments `key`, `dump`, `load` or `digest` are set to
 `"default"`, the functions defined by the `cache.defaults` dict are used
 instead.
 
-Default key function returns a string starting with the function name, followed
-by an space-separated argument list. Arguments are converted to string by
-the `str` function. Numpy arrays are converted to lists before conversion.
-Keyword arguments are presented as `k=v` where `k` is the key and `v` is the
-value. If the resulting string is too long (>200) or contain invalid characters
-(`\/:*?"<>|`) or is non-parsable (spaces or `=` within arguments), it is utf-8
-encoded and converted to a sha256 hash.  
+Default key function is constructed as follows:
+1.  Arguments and keyword arguments (both keys and values) are converted to
+    string by the `str` function. Numpy arrays are converted to lists before
+    conversion.
+2.  Any arguments which are too long (> 16 chars) or contain invalid characters
+    (`= \/:*?"<>|`) are utf-8 encoded and converted to a 64-bit truncated
+    sha256 hash.
+3.  Keyword arguments are joined as key-value pairs of the form `k=v`.
+4.  If short enough, the key is the function name followed by the
+    space-separated argument list. If too long, the key is the function
+    name followed by the full sha256 hash of the space-separated argument
+    list.
 
 Default dump and load functions are from the python pickle module.
 
-Default digest function is based on sha256 from the hashlib module.
+Default digest function is sha256.
 
 Implemented protocols include:
 -   `filename/<suffix>`: Return value is interpreted as the name of a temporary

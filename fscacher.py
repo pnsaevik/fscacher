@@ -1,6 +1,7 @@
 from pathlib import Path
 import hashlib
 import shutil
+import re
 
 
 class Cache:
@@ -54,30 +55,40 @@ class Cache:
 
 
 def _default_key(func, args, kwargs):
-    def nstr(o):
+    # Define string conversion
+    def strconv(o):
+        # Convert any numpy arguments to list
         if hasattr(o, 'tolist'):
-            return str(o.tolist())
-        else:
-            return str(o)
+            o = o.tolist()
 
-    # Build string components of key
+        ostr = str(o)
+
+        # Hashconvert if too long or contains invalid chars
+        if len(ostr) > 16 or re.search(r'[\\/:*?"<>| =]', ostr):
+            ostr = sha256(ostr, 64)
+        return ostr
+
+    # Convert arguments to string
+    args_strs = [strconv(e) for e in args]
+    kwargs_strs = [f'{strconv(k)}={strconv(v)}' for k, v in kwargs.items()]
+
+    # Build default key
     fn_name = func.__name__
-    args_strs = [nstr(e) for e in args]
-    kwargs_kv = [(nstr(k), nstr(v)) for k, v in kwargs.items()]
-    kwargs_strs = [k + '=' + v for k, v in kwargs_kv]
-    key = " ".join([fn_name] + args_strs + kwargs_strs)
+    all_args_str = " ".join(args_strs + kwargs_strs)
+    key = fn_name + " " + all_args_str
 
-    # Validate
-    import re
-    args_merge = "".join([fn_name] + args_strs + [k + v for k, v in kwargs_kv])
-    valid = (len(key) < 200) and (not re.search(r'[\\/:*?"<>| =]', args_merge))
-    if not valid:
-        return _default_digest(key)
-    else:
-        return key
+    # Use alternative key if too long
+    if len(key) > 200:
+        key = fn_name + " " + sha256(all_args_str)
+
+    return key
 
 
-def _default_digest(s: str):
+def sha256(s: str, bits=256):
     hasher = hashlib.sha256()
     hasher.update(s.encode('utf-8'))
-    return hasher.digest().hex()
+    return hasher.digest().hex()[:bits // 4]
+
+
+def _default_digest(key: str):
+    return sha256(key, 64)
