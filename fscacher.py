@@ -50,7 +50,7 @@ class Cache:
                 suffix = protocol[protocol.index('/') + 1:]
             except ValueError:
                 suffix = ""
-            funcs['key'] = lambda f, a, kw: defkey(f, a, kw) + suffix
+            funcs['key'] = lambda f, a, kw: (defkey(f, a, kw) + suffix).strip()
             funcs['dump'] = shutil.move
             funcs['load'] = lambda p: str(p)
 
