@@ -61,7 +61,7 @@ def _default_key(func, args, kwargs):
     # Define string conversion
     def strconv(o):
         # Convert any numpy arguments to list
-        if hasattr(o, 'tolist'):
+        if hasattr(o, 'tolist') and callable(o.tolist):
             o = o.tolist()
 
         ostr = str(o)
