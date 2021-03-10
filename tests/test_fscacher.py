@@ -57,11 +57,11 @@ class Test_Cache_when_filename_protocol:
             return 'testfile.txt'
 
         cache = fscacher.Cache('.')
-        memfn = cache.memoize(store_arguments_in_file, protocol='filename/.txt')
+        memfn = cache.memoize(store_arguments_in_file, protocol='filename')
         fname = memfn('hello', b=1.0)
         unlink(fname)
 
-        assert str(fname) == "store_arguments_in_file hello b=1.0.txt"
+        assert str(fname) == "store_arguments_in_file hello b=1.0"
 
     def test_accepts_directory_as_return_value(self):
         def make_hellofile_in_subdir():
