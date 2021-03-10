@@ -4,7 +4,7 @@ Caching solution for functions that operate on the file system.
 
 ## Installation
 
-`pip install <path to repository>`
+`pip install semantic-fscacher`
 
 
 ## Usage
@@ -35,8 +35,9 @@ Optional arguments to `memoize` include:
     for digesting function call signature as well as the contents of serialized
     files
 -   `protocol`: Use predefined functions for `key`, `dump`, `load` and `digest`.
-    A list of known protocol schemes are presented below. If both protocol and
-    explicit functions are set, the explicit functions takes presedence.
+    The only implemented protocol scheme is `filename`, which is presented below.
+    If both protocol and explicit functions are set, the explicit functions takes
+    presedence.
     
 If any of the arguments `key`, `dump`, `load` or `digest` are set to
 `"default"`, the functions defined by the `cache.defaults` dict are used
@@ -59,20 +60,10 @@ Default dump and load functions are from the python pickle module.
 
 Default digest function is sha256.
 
-Implemented protocols include:
--   `filename/<suffix>`: Return value is interpreted as the name of a temporary
-    file, which should have the suffix `<suffix>`, including any leading dot.
-    `key` is default key, except that `<suffix>` is appended. `dump` moves the
-    file to the index location. `load` returns the file name as a string.
--   `filehash/<suffix>`: Return value is interpreted as the name of a temporary
-    file, which should have the suffix `<suffix>`, including any leading dot.
-    `key` is default key with the suffix `.hash` appended. `dump` computes the
-    hash of the temporary file and renames it to the hash value (unless already
-    present). Thereafter, it copies the file (as a hardlink if possible) to the
-    location specified by `key`, except that `.hash` is replaced by `<suffix>`.
-    Finally, the hash is stored as a string (lowercase hex) at the location
-    specified by `key` (the index location). `load` returns the contents of the
-    file at the index location and interprets it as a `pathlib` path. In the
-    end, this protocol works like `filename/<suffix>`, except that multiple
-    function calls can be mapped to the same file if their return value has
-    equal contents.
+Except from the default functions, the only implemented protocol of pre-defined
+functions is `filename`. In this protocol, the return value is interpreted as
+the name of a temporary file, which means that serialization is not necessary.
+`dump` simply moves the file to the index location, and `load` returns the file
+name as a string. `digest` and `key` are defined as the default functions.
+Optionally, one may use `filename/<suffix>` in place of `filename`, in which
+the `key` function is modified to append `<suffix>` to the index file name.
