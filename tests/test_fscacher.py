@@ -63,6 +63,19 @@ class Test_Cache_when_filename_protocol:
 
         assert str(fname) == "store_arguments_in_file hello b=1.0"
 
+    def test_can_append_suffix(self):
+        def make_hello_file():
+            with open('testfile.txt', 'w') as f:
+                f.write("Hello")
+            return 'testfile.txt'
+
+        cache = fscacher.Cache('.')
+        memfn = cache.memoize(make_hello_file, protocol='filename/.csv')
+        fname = memfn()
+        unlink(fname)
+
+        assert str(fname).endswith(".csv")
+
     def test_accepts_directory_as_return_value(self):
         def make_hellofile_in_subdir():
             import os
