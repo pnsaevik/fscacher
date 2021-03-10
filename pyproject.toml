@@ -1,3 +1,28 @@
 [build-system]
 requires = ["setuptools >= 40.6.0", "wheel"]
 build-backend = "setuptools.build_meta"
+
+[metadata]
+name = "fscacher"
+version = "0.2.0"
+description = "File system based caching"
+long_description = "file: README.md"
+long_description_content_type = "text/markdown"
+license = 'MIT'
+license_file = "LICENSE"
+url = 'https://github.com/pnsaevik/fscacher'
+author = 'Pål Næverlid Sævik'
+author_email = 'pnsaevik@gmail.com'
+classifiers = [
+    "Programming Language :: Python :: 3",
+    "Programming Language :: Python :: 3.6",
+    "Programming Language :: Python :: 3.7",
+    "Programming Language :: Python :: 3.8",
+    "Programming Language :: Python :: 3.9",
+    "License :: OSI Approved :: MIT License",
+    "Operating System :: OS Independent",
+]
+
+[options]
+py_modules=['fscacher']
+python_requires = ">=3.6"
