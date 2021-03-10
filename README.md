@@ -1,17 +1,66 @@
 # fscacher
 
-Caching solution for functions that operate on the file system.
+Caching solution for functions that operate on the file system, with
+human-readable naming scheme for cached files.
 
 ## Installation
 
 `pip install semantic-fscacher`
 
 
-## Usage
+## Usage: simplemake
+
+Command line usage: `simplemake [opts] config.txt`, where `config.txt` is a
+configuration file containing a list of dependencies, and `opts` are optional
+parameters. Run `simplemake --help` for an overview.
+
+Each line in `config.txt` represents a single build step and has the following
+format:
+
+```
+[varname = ] [!]modulename.funcname(arglist)  [modifier_list]
+``` 
+
+The lines in `config.txt` are evaluated and executed in the order they appear.
+
+- `modulename.funcname` is the fully qualified name of the python function to be
+  executed. If the name is preceeded by an exclamation sign `!`, the return value
+  is serialized by `simplemake` (see options). Otherwise, the serialization is
+  assumed to be performed by the function itself, and the return value is
+  assumed to be the path of a temporary file containing the serialized result.
+  The temporary file is then renamed by `simplemake` according to its internal
+  naming scheme (see options).
+
+- `varname` is required if the result of the function evaluation is used by
+  subsequent build steps. It can be any valid python variable name.
+
+- `arglist` is a comma-separated list of arguments passed to the python
+  function, possibly including varnames from previous build steps. A varname
+  from a previous build step is normally passed to the function as a file name.
+  Any varname preceeded by an exclamation mark `!` is deserialized by
+  `simplemake` before being passed to the function (see options). A varname
+  which is preceeded by an asterisk `*` indicates a text file
+  containing one argument list per line. In this case, `simplemake` runs the
+  function for each given argument list, creating one serialized file per
+  execution. Finally, a summary text file containing the names of serialized
+  files is generated (one per line) and stored in `varname`.  
+
+`modifier_list` is an optional comma-separated list of keywords which indicates
+how the function call should be interpreted. A list of possible modifiers is
+given below:
+
+- `SUFFIX=<suffix>`: Appends `<suffix>` to the generated key.
+
+- `EAGER`: Specify eager evaluation, i.e., the function is evaluated regardless
+  of any previously cached results. When this parameter is specified, the key
+  is generated based on the contents of the file and not the function arguments.
+
+
+## Usage: memoize
 
 Simple usage: 
 
-```
+```python
 from fscacher import Cache
 
 cache = Cache(cache_path)
