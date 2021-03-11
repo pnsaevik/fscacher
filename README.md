@@ -8,20 +8,20 @@ human-readable naming scheme for cached files.
 `pip install semantic-fscacher`
 
 
-## Usage: simplemake
+## Command line usage
 
-Command line usage: `simplemake [opts] config.txt`, where `config.txt` is a
-configuration file containing a list of dependencies, and `opts` are optional
-parameters. Run `simplemake --help` for an overview.
+Standard usage is `simplemake [opts] makefile.txt`, where `makefile.txt`
+contains a list of dependencies, and `opts` are optional parameters. Run
+`simplemake --help` for an overview.
 
-Each line in `config.txt` represents a single build step and has the following
-format:
+Each line in `makefile.txt` represents a single build step and has the
+following format:
 
 ```
 [varname = ] [!]modulename.funcname(arglist)  [modifier_list]
 ``` 
 
-The lines in `config.txt` are evaluated and executed in the order they appear.
+The lines in `makefile.txt` are evaluated and executed in the order they appear.
 
 `modulename.funcname` is the fully qualified name of the python function to be
   executed. If the name is preceeded by an exclamation sign `!`, the return value
@@ -33,16 +33,20 @@ The lines in `config.txt` are evaluated and executed in the order they appear.
 
 `varname` is required if the result of the function evaluation is used by
   subsequent build steps. It can be any valid python variable name, and
-  represents the file where the serialized function result is stored.
+  contains the path to the file where the serialized function result is stored.
+  There is one predefined varname, `makefile`, which represents the input file
+  passed as command line argument. 
 
 `arglist` is a comma-separated list of arguments passed to the python
   function, possibly including varnames from previous build steps. A varname
   from a previous build step is normally passed to the function as a file name.
-  Any varname preceeded by an exclamation mark `!` is deserialized by
-  `simplemake` before being passed to the function (see options). Any varname
-  enclosed by square brackets `[]` is assumed to be a *jobarray* file. In this
-  case, `simplemake` executes the command repeatedly with arguments given by
-  the jobarray file (see options).  
+  There are two exceptions:
+  
+  * Any varname preceeded by an exclamation mark `!` is deserialized by
+    `simplemake` before being passed to the function (see options).
+  * Any varname enclosed by square brackets `[]` is assumed to be a
+     *jobarray* file. In this case, `simplemake` executes the command
+     repeatedly with arguments given by the jobarray file (see options).  
 
 `modifier_list` is an optional comma-separated list of keywords which indicates
   how the function call should be interpreted. A list of possible modifiers is
