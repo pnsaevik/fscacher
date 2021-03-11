@@ -1,3 +1,5 @@
+import re
+
 
 def runmake():
     import argparse
@@ -40,3 +42,50 @@ def runmake():
     )
     args = parser.parse_args()
     print(args)
+
+
+def parse_makeline(makeline):
+    m = re.match(r'(^.*?)=(.*?)\((.*?)\)(.*)', makeline)
+    if m is None:  # No equals sign
+        m = re.match(r'(^)(.*?)\((.*?)\)(.*)', makeline)
+
+    varname = m.group(1).strip()
+    funcstr = m.group(2).strip()
+    arglist = m.group(3).strip()
+    modlist = m.group(4).strip()
+
+    arg_expr = re.split(",\\s*", arglist)
+    arg_excl = [s.startswith("!") for s in arg_expr]
+    arg_ends = [s[0] + s[-1] for s in arg_expr]
+    arg_bracket = [ends == "[]" for ends in arg_ends]
+
+    arg_names = list([s.strip("[]!") for s in arg_expr])
+    arg_vals = [None] * len(arg_names)
+    for i, s in enumerate(arg_names):
+        # String argument
+        ends = s[0] + s[-1]
+        if ends == "''" or ends == '""':
+            arg_names[i] = None
+            arg_vals[i] = s[1:-1]
+
+        # Numeric argument
+        elif re.match('[0-9].*', s):
+            import json
+            arg_vals[i] = json.loads(s)
+            arg_names[i] = None
+
+        # Otherwise: Named argument
+
+    return dict(
+        varname=varname,
+        funcstr=funcstr,
+        arglist=arglist,
+        modlist=modlist,
+        args=dict(
+            names=arg_names,
+            expr=arg_expr,
+            excl=arg_excl,
+            bracket=arg_bracket,
+            values=arg_vals,
+        ),
+    )
