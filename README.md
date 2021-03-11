@@ -23,7 +23,7 @@ format:
 
 The lines in `config.txt` are evaluated and executed in the order they appear.
 
-- `modulename.funcname` is the fully qualified name of the python function to be
+`modulename.funcname` is the fully qualified name of the python function to be
   executed. If the name is preceeded by an exclamation sign `!`, the return value
   is serialized by `simplemake` (see options). Otherwise, the serialization is
   assumed to be performed by the function itself, and the return value is
@@ -31,29 +31,28 @@ The lines in `config.txt` are evaluated and executed in the order they appear.
   The temporary file is then renamed by `simplemake` according to its internal
   naming scheme (see options).
 
-- `varname` is required if the result of the function evaluation is used by
-  subsequent build steps. It can be any valid python variable name.
+`varname` is required if the result of the function evaluation is used by
+  subsequent build steps. It can be any valid python variable name, and
+  represents the file where the serialized function result is stored.
 
-- `arglist` is a comma-separated list of arguments passed to the python
+`arglist` is a comma-separated list of arguments passed to the python
   function, possibly including varnames from previous build steps. A varname
   from a previous build step is normally passed to the function as a file name.
   Any varname preceeded by an exclamation mark `!` is deserialized by
-  `simplemake` before being passed to the function (see options). A varname
-  which is preceeded by an asterisk `*` indicates a text file
-  containing one argument list per line. In this case, `simplemake` runs the
-  function for each given argument list, creating one serialized file per
-  execution. Finally, a summary text file containing the names of serialized
-  files is generated (one per line) and stored in `varname`.  
+  `simplemake` before being passed to the function (see options). Any varname
+  enclosed by square brackets `[]` is assumed to be a *jobarray* file. In this
+  case, `simplemake` executes the command repeatedly with arguments given by
+  the jobarray file (see options).  
 
 `modifier_list` is an optional comma-separated list of keywords which indicates
-how the function call should be interpreted. A list of possible modifiers is
-given below:
+  how the function call should be interpreted. A list of possible modifiers is
+  given below:
 
-- `SUFFIX=<suffix>`: Appends `<suffix>` to the generated key.
+  * `SUFFIX=.suffix`: Appends `.suffix` to the generated key.
 
-- `EAGER`: Specify eager evaluation, i.e., the function is evaluated regardless
-  of any previously cached results. When this parameter is specified, the key
-  is generated based on the contents of the file and not the function arguments.
+  * `EAGER`: Specify eager evaluation, i.e., the function is evaluated regardless
+    of any previously cached results. When this parameter is specified, the key
+    is generated based on the contents of the file and not the function arguments.
 
 
 ## Usage: memoize
