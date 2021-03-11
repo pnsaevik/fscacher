@@ -1,6 +1,8 @@
 from fscacher import make
 
 
+
+
 class Test_parse_makeline:
     def test_finds_funcname(self):
         cmd = make.parse_makeline("package.module.func(arg1, arg2)")
@@ -22,5 +24,11 @@ class Test_parse_makeline:
     def test_finds_varname(self):
         cmd = make.parse_makeline("myvar = package.module.func(arg1, arg2)")
         assert cmd['varname'] == 'myvar'
+
+
+class Test_load_funcname:
+    def test_can_load_function(self):
+        fn = make.load_funcname('sys.exit')
+        assert callable(fn)
 
 

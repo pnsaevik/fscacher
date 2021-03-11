@@ -89,3 +89,10 @@ def parse_makeline(makeline):
             values=arg_vals,
         ),
     )
+
+
+def load_funcname(funcname: str):
+    pkg_name, fn_name = funcname.rsplit('.', 1)
+    import importlib
+    pkg = importlib.import_module(pkg_name)
+    return getattr(pkg, fn_name)
