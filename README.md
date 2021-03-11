@@ -45,8 +45,10 @@ The lines in `makefile.txt` are evaluated and executed in the order they appear.
   * Any varname preceeded by an exclamation mark `!` is deserialized by
     `simplemake` before being passed to the function (see options).
   * Any varname enclosed by square brackets `[]` is assumed to be a
-     *jobarray* file. In this case, `simplemake` executes the command
-     repeatedly with arguments given by the jobarray file (see options).  
+    *jobarray* file. In this case, `simplemake` executes the command
+    repeatedly with arguments given by the lines in the jobarray file, and
+    returns a summary file containing the file names of the serialized results,
+    one file name per line.  
 
 `modifier_list` is an optional comma-separated list of keywords which indicates
   how the function call should be interpreted. A list of possible modifiers is
