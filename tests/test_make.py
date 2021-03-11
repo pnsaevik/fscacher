@@ -1,12 +1,21 @@
+import contextlib
+import shutil
+import os
+from . import conftest
 from fscacher import make
 
 
+class Test_make:
+    def test_generates_files(self):
+        with runmake('makefile_simple.txt') as outdir:
+            fnames = os.listdir(outdir)
+            assert len(fnames) == 4  # makefile + 3 result files
 
 
 class Test_parse_makeline:
     def test_finds_funcname(self):
         cmd = make.parse_makeline("package.module.func(arg1, arg2)")
-        assert cmd['funcstr'] == "package.module.func"
+        assert cmd['funcname'] == "package.module.func"
 
     def test_finds_args(self):
         cmd = make.parse_makeline('m.fn(arg1, !arg2, [arg3], 4, 5.25, "6")')
@@ -32,3 +41,18 @@ class Test_load_funcname:
         assert callable(fn)
 
 
+@contextlib.contextmanager
+def runmake(fname):
+    outdir = conftest.outpath(fname + '_tmpdir')
+    prevdir = os.curdir
+    try:
+        os.makedirs(outdir, exist_ok=True)
+        os.chdir(outdir)
+        orgfile = conftest.fixturepath(fname)
+        newfile = os.path.join(outdir, fname)
+        shutil.copy(orgfile, newfile)
+        make.make(newfile)
+        yield outdir
+    finally:
+        os.chdir(prevdir)
+        shutil.rmtree(outdir, ignore_errors=True)

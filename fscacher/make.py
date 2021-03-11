@@ -23,7 +23,7 @@ def runmake():
             '`obj = load(fname)`. Default functions are `fscacher.dump` '
             'and `fscacher.load`, which utilize the python pickle module. '
         ),
-        default='fscacher',
+        default=None,
     )
     parser.add_argument(
         '--keygen',
@@ -38,10 +38,62 @@ def runmake():
             'a string representation of the arguments. If they are too long or contain '
             'invalid characters, the arguments are replaced by hash representations. '
         ),
-        default='fscacher.key',
+        default=None,
     )
     args = parser.parse_args()
-    print(args)
+
+    make(args.makefile, args.serializer, args.keygen)
+
+
+def make(makefile, serializer=None, keygen=None):
+    # Handle variations on the makefile argument
+    if isinstance(makefile, list):
+        makelines = makefile
+    else:
+        with open(makefile, 'r', encoding='utf-8') as f:
+            makelines = f.readlines()
+
+    # Handle default arguments
+    if serializer is None:
+        from . import dump
+        from . import load
+    else:
+        dump = None
+        load = None
+
+    # Handle default arguments
+    if keygen is None:
+        from . import key
+        from . import key_content
+    else:
+        key = None
+        from . import key_content
+
+    # Execute build process
+    varnames = dict(makefile=makefile)
+    for makeline in makelines:
+        build(makeline, varnames, dump, load, key, key_content)
+
+
+def build(makeline, varnames, dump, load, key, key_content):
+    cmd = parse_makeline(makeline)
+    fn = load_funcname(cmd['funcname'])
+
+    nargs = len(cmd['args']['values'])
+    args = [None] * nargs
+    for i in range(nargs):
+        # Literal argument
+        if cmd['args']['values'][i] is not None:
+            arg = cmd['args']['values'][i]
+
+        # Pass-directly named argument
+        else:
+            arg = varnames[cmd['args']['names'][i]]
+
+        args[i] = arg
+
+    result = fn(*args)
+    return result
 
 
 def parse_makeline(makeline):
@@ -78,7 +130,7 @@ def parse_makeline(makeline):
 
     return dict(
         varname=varname,
-        funcstr=funcstr,
+        funcname=funcstr,
         arglist=arglist,
         modlist=modlist,
         args=dict(
