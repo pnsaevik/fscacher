@@ -15,6 +15,12 @@ class Test_make:
         with runmake('makefile_simple.txt', outfile='out.txt') as outdir:
             assert os.path.exists(os.path.join(outdir, 'out.txt'))
 
+    def test_renames_outfiles(self):
+        with runmake('makefile_simple.txt') as outdir:
+            fnames = os.listdir(outdir)
+            assert 'jsondump something' in fnames
+            assert 'jsondump 123' in fnames
+
 
 class Test_parse_makeline:
     def test_finds_funcname(self):

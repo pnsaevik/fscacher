@@ -11,7 +11,7 @@ human-readable naming scheme for cached files.
 ## Features
 
 * Execute a series of python commands which returns serialized results
-* (not implemented) Rename results according to the command name and arguments
+* Rename results according to the command name and arguments
 * (not implemented) Re-use precomputed results
 * (not implemented) Specify suffix to be appended to file names
 * (not implemented) Auto-serialization for commands that returns objects
