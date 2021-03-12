@@ -1,17 +1,83 @@
 # fscacher
 
-Caching solution for functions that operate on the file system.
+Caching solution for functions that operate on the file system, with
+human-readable naming scheme for cached files.
 
 ## Installation
 
 `pip install semantic-fscacher`
 
 
-## Usage
+## Features
+
+* Execute a series of python commands which returns serialized results
+* Rename results according to the command name and arguments
+* (not implemented) Re-use precomputed results
+* (not implemented) Define variables in makefile
+* (not implemented) Specify suffix to be appended to file names
+* (not implemented) Auto-serialization for commands that returns objects
+* (not implemented) Deserialization of command arguments
+* (not implemented) Rename results according to contents of results (eager evaluation)
+* (not implemented) Convert commands to job arrays
+
+## Command line usage
+
+Standard usage is `simplemake [opts] makefile.txt`, where `makefile.txt`
+contains a list of dependencies, and `opts` are optional parameters. Run
+`simplemake --help` for an overview.
+
+Each line in `makefile.txt` represents a single build step and has the
+following format:
+
+```
+[varname = ] [!]modulename.funcname(arglist)  [modifier_list]
+``` 
+
+The lines in `makefile.txt` are evaluated and executed in the order they appear.
+
+`modulename.funcname` is the fully qualified name of the python function to be
+  executed. If the name is preceeded by an exclamation sign `!`, the return value
+  is serialized by `simplemake` (see options). Otherwise, the serialization is
+  assumed to be performed by the function itself, and the return value is
+  assumed to be the path of a temporary file containing the serialized result.
+  The temporary file is then renamed by `simplemake` according to its internal
+  naming scheme (see options).
+
+`varname` is required if the result of the function evaluation is used by
+  subsequent build steps. It can be any valid python variable name, and
+  contains the path to the file where the serialized function result is stored.
+  There is one predefined varname, `makefile`, which represents the input file
+  passed as command line argument. 
+
+`arglist` is a comma-separated list of arguments passed to the python
+  function, possibly including varnames from previous build steps. A varname
+  from a previous build step is normally passed to the function as a file name.
+  There are two exceptions:
+  
+  * Any varname preceeded by an exclamation mark `!` is deserialized by
+    `simplemake` before being passed to the function (see options).
+  * Any varname enclosed by square brackets `[]` is assumed to be a
+    *jobarray* file. In this case, `simplemake` executes the command
+    repeatedly with arguments given by the lines in the jobarray file, and
+    returns a summary file containing the file names of the serialized results,
+    one file name per line.  
+
+`modifier_list` is an optional comma-separated list of keywords which indicates
+  how the function call should be interpreted. A list of possible modifiers is
+  given below:
+
+  * `SUFFIX=.suffix`: Appends `.suffix` to the generated key.
+
+  * `EAGER`: Specify eager evaluation, i.e., the function is evaluated regardless
+    of any previously cached results. When this parameter is specified, the key
+    is generated based on the contents of the file and not the function arguments.
+
+
+## Usage: memoize
 
 Simple usage: 
 
-```
+```python
 from fscacher import Cache
 
 cache = Cache(cache_path)

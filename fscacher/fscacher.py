@@ -5,10 +5,10 @@ import re
 
 
 class Cache:
-    def __init__(self, path=None):
+    def __init__(self, path=None, key=None):
         self.path = Path(path)
         self.defaults = dict(
-            key=_default_key,
+            key=key or _default_key,
             digest=_default_digest,
         )
 

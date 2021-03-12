@@ -1,0 +1,3 @@
+fscacher.testfuncs.jsondump("something")
+fscacher.testfuncs.jsondump(123)
+fscacher.testfuncs.jsondump(4.0)
