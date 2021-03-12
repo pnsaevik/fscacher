@@ -8,6 +8,17 @@ human-readable naming scheme for cached files.
 `pip install semantic-fscacher`
 
 
+## Features
+
+* Execute a series of python commands which returns serialized results
+* (not implemented) Rename results according to the command name and arguments
+* (not implemented) Re-use precomputed results
+* (not implemented) Specify suffix to be appended to file names
+* (not implemented) Auto-serialization for commands that returns objects
+* (not implemented) Deserialization of command arguments
+* (not implemented) Rename results according to contents of results (eager evaluation)
+* (not implemented) Convert commands to job arrays
+
 ## Command line usage
 
 Standard usage is `simplemake [opts] makefile.txt`, where `makefile.txt`
