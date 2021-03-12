@@ -97,49 +97,57 @@ def build(makeline, varnames, dump, load, key, key_content):
 
 
 def parse_makeline(makeline):
-    m = re.match(r'(^.*?)=(.*?)\((.*?)\)(.*)', makeline)
-    if m is None:  # No equals sign
+    # Standard interpretation: var = func(arg1, arg2) MOD1, MOD2=4
+    m = re.match(r'(^[a-zA-Z0-9_ ]*?)=(.*?)\((.*?)\)(.*)', makeline)
+
+    # Possibly no `var =` in the beginning of string
+    if m is None:
         m = re.match(r'(^)(.*?)\((.*?)\)(.*)', makeline)
 
+    # Four parts of the makeline string
     varname = m.group(1).strip()
     funcstr = m.group(2).strip()
     arglist = m.group(3).strip()
     modlist = m.group(4).strip()
 
-    arg_expr = re.split(",\\s*", arglist)
-    arg_excl = [s.startswith("!") for s in arg_expr]
-    arg_ends = [s[0] + s[-1] for s in arg_expr]
-    arg_bracket = [ends == "[]" for ends in arg_ends]
+    def parse_argument_list(arg_list):
+        # Split by comma + possible whitespace
+        arg_items = re.split(",\\s*", arg_list)
 
-    arg_names = list([s.strip("[]!") for s in arg_expr])
-    arg_vals = [None] * len(arg_names)
-    for i, s in enumerate(arg_names):
-        # String argument
-        ends = s[0] + s[-1]
-        if ends == "''" or ends == '""':
-            arg_names[i] = None
-            arg_vals[i] = s[1:-1]
+        # Check if exclamation or brackets are present
+        arg_has_exclamation = [s.startswith("!") for s in arg_items]
+        arg_start_and_stop = [s[0] + s[-1] for s in arg_items]
+        arg_has_bracket = [ends == "[]" for ends in arg_start_and_stop]
 
-        # Numeric argument
-        elif re.match('[0-9].*', s):
-            import json
-            arg_vals[i] = json.loads(s)
-            arg_names[i] = None
+        # Parse literal arguments
+        arg_names = list([s.strip("[]!") for s in arg_items])
+        arg_vals = [None] * len(arg_names)
+        for i, s in enumerate(arg_names):
+            # String argument
+            ends = s[0] + s[-1]
+            if ends == "''" or ends == '""':
+                arg_names[i] = None
+                arg_vals[i] = s[1:-1]
 
-        # Otherwise: Named argument
+            # Numeric argument
+            elif re.match('[0-9].*', s):
+                import json
+                arg_vals[i] = json.loads(s)
+                arg_names[i] = None
+
+            # Otherwise: Named argument
+            else:
+                pass
+
+        return dict(names=arg_names, expr=arg_items, excl=arg_has_exclamation,
+                    bracket=arg_has_bracket, values=arg_vals)
 
     return dict(
         varname=varname,
         funcname=funcstr,
         arglist=arglist,
         modlist=modlist,
-        args=dict(
-            names=arg_names,
-            expr=arg_expr,
-            excl=arg_excl,
-            bracket=arg_bracket,
-            values=arg_vals,
-        ),
+        args=parse_argument_list(arglist),
     )
 
 
