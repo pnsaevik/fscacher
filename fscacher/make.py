@@ -43,11 +43,20 @@ def runmake():
         default=None,
     )
     args = parser.parse_args()
+    parser.add_argument(
+        '--outfile',
+        metavar='O',
+        type=str,
+        help=(
+            'Output file where generated build files are stored, one per line.'
+        ),
+        default=None,
+    )
 
-    make(args.makefile, args.serializer, args.keygen)
+    make(args.makefile, args.serializer, args.keygen, args.outfile)
 
 
-def make(makefile, serializer=None, keygen=None):
+def make(makefile, serializer=None, keygen=None, outfile_fname=None):
     # Handle variations on the makefile argument
     if isinstance(makefile, list):
         makelines = makefile
@@ -78,8 +87,18 @@ def make(makefile, serializer=None, keygen=None):
 
     # Execute build process
     varnames = dict(makefile=makefile)
-    for makeline in makelines:
+    outfiles = [
         build(makeline, varnames, dump, load, key, key_content, cache)
+        for makeline in makelines
+    ]
+
+    # Store outfile if specified
+    if outfile_fname:
+        outfile_path = os.path.join(os.path.dirname(makefile), outfile_fname)
+        with open(outfile_path, 'w', encoding='utf-8') as f:
+            f.writelines([str(n) for n in outfiles])
+
+    return outfiles
 
 
 def build(makeline, varnames, dump, load, key, key_content, cache):

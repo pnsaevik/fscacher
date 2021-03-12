@@ -11,6 +11,10 @@ class Test_make:
             fnames = os.listdir(outdir)
             assert len(fnames) == 4  # makefile + 3 result files
 
+    def test_can_generate_outfile(self):
+        with runmake('makefile_simple.txt', outfile='out.txt') as outdir:
+            assert os.path.exists(os.path.join(outdir, 'out.txt'))
+
 
 class Test_parse_makeline:
     def test_finds_funcname(self):
@@ -64,14 +68,14 @@ class Test_load_funcname:
 
 
 @contextlib.contextmanager
-def runmake(fname):
+def runmake(fname, outfile=None):
     outdir = conftest.outpath(fname + '_tmpdir')
     try:
         os.makedirs(outdir, exist_ok=True)
         orgfile = conftest.fixturepath(fname)
         newfile = os.path.join(outdir, fname)
         shutil.copy(orgfile, newfile)
-        make.make(newfile)
+        make.make(newfile, outfile_fname=outfile)
         yield outdir
     finally:
         shutil.rmtree(outdir, ignore_errors=True)
