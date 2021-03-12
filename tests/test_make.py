@@ -35,7 +35,7 @@ class Test_parse_makeline:
         assert cmd['varname'] == 'myvar'
 
 
-class Test_eval_makeline:
+class Test_get_makeline_funccall:
     def test_evaluates_function(self):
         fn_name = make.__name__ + '.' + make.get_makeline_funccall.__name__
         cmd = dict(
@@ -66,15 +66,12 @@ class Test_load_funcname:
 @contextlib.contextmanager
 def runmake(fname):
     outdir = conftest.outpath(fname + '_tmpdir')
-    prevdir = os.curdir
     try:
         os.makedirs(outdir, exist_ok=True)
-        os.chdir(outdir)
         orgfile = conftest.fixturepath(fname)
         newfile = os.path.join(outdir, fname)
         shutil.copy(orgfile, newfile)
         make.make(newfile)
         yield outdir
     finally:
-        os.chdir(prevdir)
         shutil.rmtree(outdir, ignore_errors=True)

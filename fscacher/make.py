@@ -1,4 +1,6 @@
 import re
+import os
+import shutil
 
 
 def runmake():
@@ -69,31 +71,32 @@ def make(makefile, serializer=None, keygen=None):
         key = None
         from . import key_content
 
+    # Create cache
+    import os
+    from .fscacher import Cache
+    cache = Cache(os.path.dirname(makefile))
+
     # Execute build process
     varnames = dict(makefile=makefile)
     for makeline in makelines:
-        build(makeline, varnames, dump, load, key, key_content)
+        build(makeline, varnames, dump, load, key, key_content, cache)
 
 
-def build(makeline, varnames, dump, load, key, key_content):
+def build(makeline, varnames, dump, load, key, key_content, cache):
     cmd = parse_makeline(makeline)
-    fn = load_funcname(cmd['funcname'])
+    fn, args, kwargs = get_makeline_funccall(cmd, varnames)
 
-    nargs = len(cmd['args']['values'])
-    args = [None] * nargs
-    for i in range(nargs):
-        # Literal argument
-        if cmd['args']['values'][i] is not None:
-            arg = cmd['args']['values'][i]
+    # Define memoized function
+    memfn = cache.memoize(
+        fn, key=key,
+        dump=lambda obj, fname: shutil.move(obj, os.path.join(cache.path, fname)),
+        load=lambda fname: fname,
+    )
 
-        # Pass-directly named argument
-        else:
-            arg = varnames[cmd['args']['names'][i]]
+    # Run memoized function
+    outfile = memfn(*args, **kwargs)
 
-        args[i] = arg
-
-    result = fn(*args)
-    return result
+    return outfile
 
 
 def get_makeline_funccall(cmd, varnames):
