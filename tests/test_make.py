@@ -35,6 +35,28 @@ class Test_parse_makeline:
         assert cmd['varname'] == 'myvar'
 
 
+class Test_eval_makeline:
+    def test_evaluates_function(self):
+        fn_name = make.__name__ + '.' + make.get_makeline_funccall.__name__
+        cmd = dict(
+            funcname=fn_name,
+            args=dict(names=['myfile', None], values=[None, 2]),
+        )
+        func, args, kwargs = make.get_makeline_funccall(cmd, dict())
+        assert func == make.get_makeline_funccall
+
+    def test_evaluates_variable_names(self):
+        fn_name = make.__name__ + '.' + make.get_makeline_funccall.__name__
+        varnames = dict(myfile='myfile.txt')
+        cmd = dict(
+            funcname=fn_name,
+            args=dict(names=['myfile', None], values=[None, 2]),
+        )
+        func, args, kwargs = make.get_makeline_funccall(cmd, varnames)
+        assert args == ('myfile.txt', 2)
+        assert kwargs == dict()
+
+
 class Test_load_funcname:
     def test_can_load_function(self):
         fn = make.load_funcname('sys.exit')

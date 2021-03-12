@@ -96,6 +96,16 @@ def build(makeline, varnames, dump, load, key, key_content):
     return result
 
 
+def get_makeline_funccall(cmd, varnames):
+    arg_names_and_vals = zip(cmd['args']['names'], cmd['args']['values'])
+
+    func = load_funcname(cmd['funcname'])
+    args = tuple(varnames.get(n, v) for n, v in arg_names_and_vals)
+    kwargs = dict()
+
+    return func, args, kwargs
+
+
 def parse_makeline(makeline):
     # Standard interpretation: var = func(arg1, arg2) MOD1, MOD2=4
     m = re.match(r'(^[a-zA-Z0-9_ ]*?)=(.*?)\((.*?)\)(.*)', makeline)
