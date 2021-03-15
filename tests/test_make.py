@@ -21,6 +21,14 @@ class Test_make:
             assert 'jsondump something' in fnames
             assert 'jsondump 123' in fnames
 
+    def test_computes_only_once(self):
+        in_file = 'makefile_repeated.txt'
+        with runmake(in_file) as outdir:
+            fnames = os.listdir(outdir)
+            outfile = next(f for f in fnames if f != in_file)
+            with open(os.path.join(outdir, outfile), 'r') as f:
+                assert f.read() == '[1]'
+
 
 class Test_parse_makeline:
     def test_finds_funcname_when_args(self):
