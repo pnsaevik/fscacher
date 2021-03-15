@@ -12,8 +12,8 @@ human-readable naming scheme for cached files.
 
 * Execute a series of python commands which returns serialized results
 * Rename results according to the command name and arguments
-* (not implemented) Re-use precomputed results
-* (not implemented) Define variables in makefile
+* Re-use precomputed results
+* Define variables in makefile
 * (not implemented) Specify suffix to be appended to file names
 * (not implemented) Auto-serialization for commands that returns objects
 * (not implemented) Deserialization of command arguments
