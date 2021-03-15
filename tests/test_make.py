@@ -23,8 +23,12 @@ class Test_make:
 
 
 class Test_parse_makeline:
-    def test_finds_funcname(self):
+    def test_finds_funcname_when_args(self):
         cmd = make.parse_makeline("package.module.func(arg1, arg2)")
+        assert cmd['funcname'] == "package.module.func"
+
+    def test_finds_funcname_when_no_args(self):
+        cmd = make.parse_makeline("package.module.func()")
         assert cmd['funcname'] == "package.module.func"
 
     def test_finds_args(self):

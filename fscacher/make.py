@@ -144,7 +144,7 @@ def parse_makeline(makeline):
 
     def parse_argument_list(arg_list):
         # Split by comma + possible whitespace
-        arg_items = re.split(",\\s*", arg_list)
+        arg_items = [a for a in re.split(",\\s*", arg_list) if a != '']
 
         # Check if exclamation or brackets are present
         arg_has_exclamation = [s.startswith("!") for s in arg_items]
