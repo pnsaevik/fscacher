@@ -1,0 +1,2 @@
+a = fscacher.testfuncs.jsondump(makefile)
+fscacher.testfuncs.jsondump(makefile, a)
