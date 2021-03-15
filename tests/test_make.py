@@ -29,6 +29,22 @@ class Test_make:
             with open(os.path.join(outdir, outfile), 'r') as f:
                 assert f.read() == '[1]'
 
+    def test_can_define_varnames(self):
+        in_file = 'makefile_varnames.txt'
+        out_file = 'out.txt'
+        with runmake(in_file, outfile=out_file) as outdir:
+            with open(os.path.join(outdir, out_file)) as f:
+                artifacts = [line.rstrip('\r\n') for line in f]
+
+            lastfile = os.path.join(outdir, artifacts[1])
+            with open(lastfile) as f:
+                import json
+                contents = json.load(f)
+
+        assert len(contents) == 2
+        assert contents[0].endswith(in_file)
+        assert contents[1].endswith(artifacts[0])
+
 
 class Test_parse_makeline:
     def test_finds_funcname_when_args(self):

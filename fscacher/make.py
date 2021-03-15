@@ -96,7 +96,7 @@ def make(makefile, serializer=None, keygen=None, outfile_fname=None):
     if outfile_fname:
         outfile_path = os.path.join(os.path.dirname(makefile), outfile_fname)
         with open(outfile_path, 'w', encoding='utf-8') as f:
-            f.writelines([str(n) for n in outfiles])
+            f.writelines([str(n) + '\n' for n in outfiles])
 
     return outfiles
 
