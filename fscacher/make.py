@@ -115,6 +115,10 @@ def build(makeline, varnames, dump, load, key, key_content, cache):
     # Run memoized function
     outfile = memfn(*args, **kwargs)
 
+    # Store result in variable if requested
+    if cmd['varname']:
+        varnames[cmd['varname']] = str(outfile)
+
     return outfile
 
 

@@ -43,7 +43,7 @@ class Test_make:
 
         assert len(contents) == 2
         assert contents[0].endswith(in_file)
-        assert contents[1].endswith(artifacts[0])
+        assert contents[1] == artifacts[0]
 
 
 class Test_parse_makeline:
