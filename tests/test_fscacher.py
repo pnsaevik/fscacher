@@ -115,6 +115,7 @@ class Test_eval:
             kwargs={'b': 3},
         )
 
+        assert pickle.dumps(5, 4).hex() == '80044b052e'
         assert path.name == 'add 84ba742f027f096e22b317d9d482effc38f6764b43af6d951ba47c447bb80e78'
 
         unlink(path)
