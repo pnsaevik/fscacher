@@ -45,6 +45,13 @@ class Test_make:
         assert contents[0].endswith(in_file)
         assert contents[1] == artifacts[0]
 
+    def test_can_add_suffix(self):
+        in_file = 'makefile_suffix.txt'
+        with runmake(in_file) as outdir:
+            fnames = os.listdir(outdir)
+            outfile = next(f for f in fnames if f != in_file)
+            assert outfile.endswith('.json')
+
 
 class Test_parse_makeline:
     def test_finds_funcname_when_args(self):
