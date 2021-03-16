@@ -109,15 +109,15 @@ class Test_eval:
 
         cache = fscacher.Cache('.')
 
-        fname = cache.eval(
+        path = cache.eval(
             func=add,
             args=(2,),
             kwargs={'b': 3},
         )
 
-        assert fname == 'add 84ba742f027f096e22b317d9d482effc38f6764b43af6d951ba47c447bb80e78'
+        assert path.name == 'add 84ba742f027f096e22b317d9d482effc38f6764b43af6d951ba47c447bb80e78'
 
-        unlink(fname)
+        unlink(path)
 
     def test_dumps_result_into_file(self):
         def add(a, b):

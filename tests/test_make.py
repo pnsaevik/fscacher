@@ -52,15 +52,7 @@ class Test_make:
             outfile = next(f for f in fnames if f != in_file)
             assert outfile.endswith('.json')
 
-    def test_computes_eager_functions_repeatedly(self):
-        in_file = 'makefile_eager.txt'
-        with runmake(in_file) as outdir:
-            fnames = os.listdir(outdir)
-            outfile = next(f for f in fnames if f != in_file)
-            with open(os.path.join(outdir, outfile), 'r') as f:
-                assert f.read() == '[3]'
-
-    def test_renames_eager_results_according_to_contents(self):
+    def test_executes_eager_functions_repeatedly_and_use_content_based_names(self):
         from fscacher.keygen import sha256
         in_file = 'makefile_eager.txt'
         with runmake(in_file) as outdir:

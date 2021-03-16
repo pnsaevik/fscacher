@@ -12,7 +12,7 @@ class Cache:
             digest=_default_digest,
             dump=_default_dump,
             load=_default_load,
-        )
+        )  # type: dict
 
     def __contains__(self, item):
         return self.path.joinpath(str(item)).exists()
@@ -52,7 +52,7 @@ class Cache:
         except IOError:
             pass
 
-        return k
+        return path
 
     def _interpret_options(self, key, dump, load, digest, protocol):
         funcs = self.defaults.copy()
