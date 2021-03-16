@@ -25,7 +25,7 @@ class Test_make:
         in_file = 'makefile_repeated.txt'
         with runmake(in_file) as outdir:
             fnames = os.listdir(outdir)
-            outfile = next(f for f in fnames if f != in_file)
+            outfile = next(f for f in fnames if f.startswith('increment'))
             with open(os.path.join(outdir, outfile), 'r') as f:
                 assert f.read() == '[1]'
 
