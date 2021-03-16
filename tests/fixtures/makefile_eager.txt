@@ -1,0 +1,4 @@
+fscacher.testfuncs.reset_counter()
+fscacher.testfuncs.increment()  EAGER
+fscacher.testfuncs.increment()  EAGER
+fscacher.testfuncs.increment()  EAGER

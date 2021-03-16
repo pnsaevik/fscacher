@@ -1,3 +1,4 @@
+fscacher.testfuncs.reset_counter()
 fscacher.testfuncs.increment()
 fscacher.testfuncs.increment()
 fscacher.testfuncs.increment()
