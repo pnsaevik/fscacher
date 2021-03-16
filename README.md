@@ -14,7 +14,7 @@ human-readable naming scheme for cached files.
 * Rename results according to the command name and arguments
 * Re-use precomputed results
 * Define variables in makefile
-* (not implemented) Specify suffix to be appended to file names
+* Specify suffix to be appended to file names
 * (not implemented) Auto-serialization for commands that returns objects
 * (not implemented) Deserialization of command arguments
 * (not implemented) Rename results according to contents of results (eager evaluation)

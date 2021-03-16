@@ -45,6 +45,13 @@ class Test_make:
         assert contents[0].endswith(in_file)
         assert contents[1] == artifacts[0]
 
+    def test_can_add_suffix(self):
+        in_file = 'makefile_suffix.txt'
+        with runmake(in_file) as outdir:
+            fnames = os.listdir(outdir)
+            outfile = next(f for f in fnames if f != in_file)
+            assert outfile.endswith('.json')
+
 
 class Test_parse_makeline:
     def test_finds_funcname_when_args(self):
@@ -65,8 +72,11 @@ class Test_parse_makeline:
         assert cmd['args']['bracket'] == [False, False, True] + [False] * 3
 
     def test_finds_modifiers(self):
-        cmd = make.parse_makeline("package.module.func(arg1, arg2) MOD1, MOD2=4")
-        assert cmd['modlist'] == "MOD1, MOD2=4"
+        cmd = make.parse_makeline(
+            "package.module.func(arg1, arg2) MOD1, MOD2=4, MOD3=text")
+        assert cmd['modlist'] == "MOD1, MOD2=4, MOD3=text"
+        assert cmd['mods']['names'] == ['MOD1', 'MOD2', 'MOD3']
+        assert cmd['mods']['values'] == [None, 4, 'text']
 
     def test_finds_varname(self):
         cmd = make.parse_makeline("myvar = package.module.func(arg1, arg2)")

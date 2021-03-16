@@ -1,6 +1,7 @@
 import re
 import os
 import shutil
+import json
 
 
 def runmake():
@@ -101,13 +102,22 @@ def make(makefile, serializer=None, keygen=None, outfile_fname=None):
     return outfiles
 
 
+def _key_with_suffix(keyfn, suffix):
+    if suffix:
+        return lambda *args, **kwargs: keyfn(*args, **kwargs) + suffix
+    else:
+        return keyfn
+
+
 def build(makeline, varnames, dump, load, key, key_content, cache):
     cmd = parse_makeline(makeline)
     fn, args, kwargs = get_makeline_funccall(cmd, varnames)
+    suffix = dict(zip(cmd['mods']['names'], cmd['mods']['values'])).get('SUFFIX', None)
 
     # Define memoized function
     memfn = cache.memoize(
-        fn, key=key,
+        fn,
+        key=_key_with_suffix(key, suffix),
         dump=lambda obj, fname: shutil.move(obj, os.path.join(cache.path, fname)),
         load=lambda fname: fname,
     )
@@ -148,7 +158,7 @@ def parse_makeline(makeline):
 
     def parse_argument_list(arg_list):
         # Split by comma + possible whitespace
-        arg_items = [a for a in re.split(",\\s*", arg_list) if a != '']
+        arg_items = [a for a in re.split("\\s*,\\s*", arg_list) if a != '']
 
         # Check if exclamation or brackets are present
         arg_has_exclamation = [s.startswith("!") for s in arg_items]
@@ -167,7 +177,6 @@ def parse_makeline(makeline):
 
             # Numeric argument
             elif re.match('[0-9].*', s):
-                import json
                 arg_vals[i] = json.loads(s)
                 arg_names[i] = None
 
@@ -178,12 +187,22 @@ def parse_makeline(makeline):
         return dict(names=arg_names, expr=arg_items, excl=arg_has_exclamation,
                     bracket=arg_has_bracket, values=arg_vals)
 
+    def parse_mod_list(mod_list):
+        mod_items = [a.split('=') for a in mod_list.split(',') if a != '']
+        mod_names = [a[0].strip() for a in mod_items]
+        mod_strval = [a[1].strip() if len(a) > 1 else None for a in mod_items]
+        mod_values = [json.loads(a) if a and re.match('[0-9].*', a) else a
+                      for a in mod_strval]
+
+        return dict(names=mod_names, values=mod_values)
+
     return dict(
         varname=varname,
         funcname=funcstr,
         arglist=arglist,
         modlist=modlist,
         args=parse_argument_list(arglist),
+        mods=parse_mod_list(modlist),
     )
 
 
