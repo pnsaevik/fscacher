@@ -1,4 +1,5 @@
 import fscacher
+import pickle
 from pathlib import Path
 
 
@@ -99,3 +100,39 @@ class Test_Cache_when_filename_protocol:
             for fname in list(dirpath.iterdir()):
                 unlink(fname)
             dirpath.rmdir()
+
+
+class Test_eval:
+    def test_renames_result_according_to_contents(self):
+        def add(a, b):
+            return a + b
+
+        cache = fscacher.Cache('.')
+
+        path = cache.eval(
+            func=add,
+            args=(2,),
+            kwargs={'b': 3},
+        )
+
+        assert path.name == 'add 84ba742f027f096e22b317d9d482effc38f6764b43af6d951ba47c447bb80e78'
+
+        unlink(path)
+
+    def test_dumps_result_into_file(self):
+        def add(a, b):
+            return a + b
+
+        cache = fscacher.Cache('.')
+
+        fname = cache.eval(
+            func=add,
+            args=(2,),
+            kwargs={'b': 3},
+        )
+
+        try:
+            with open(fname, 'br') as f:
+                assert pickle.load(f) == 5
+        finally:
+            unlink(fname)

@@ -21,3 +21,8 @@ def jsondump(*args):
 def increment():
     _COUNTER[0] += 1
     return jsondump(_COUNTER[0])
+
+
+def reset_counter():
+    _COUNTER[0] = 0
+    return jsondump(0)

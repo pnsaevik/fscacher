@@ -17,12 +17,3 @@ class Test_key:
     def test_when_long_key(self):
         k = keygen.key(keygen.key, ("*", ) * 20, {})
         assert k == "key e193cc64f08eedec96b6195385ac364cf6da879f5073f2ad89de93300c639cd4"
-
-
-class Test_key_content:
-    def test_empty_stream(self):
-        import io
-        from hashlib import sha256
-        buf = io.BytesIO()
-        k = keygen.key_content(keygen.key_content, buf)
-        assert k == "key_content " + sha256().digest().hex()

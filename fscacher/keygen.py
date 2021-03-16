@@ -32,14 +32,15 @@ def key(func, args, kwargs):
     return k
 
 
-def key_content(func, stream):
+def key_content(func, fname):
     page_size = 65536
     hasher = hashlib.sha256()
 
-    read_data = stream.read(page_size)
-    while read_data:
-        hasher.update(read_data)
+    with open(fname, 'br') as stream:
         read_data = stream.read(page_size)
+        while read_data:
+            hasher.update(read_data)
+            read_data = stream.read(page_size)
 
     return func.__name__ + " " + hasher.digest().hex()
 

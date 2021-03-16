@@ -114,16 +114,25 @@ def build(makeline, varnames, dump, load, key, key_content, cache):
     fn, args, kwargs = get_makeline_funccall(cmd, varnames)
     suffix = dict(zip(cmd['mods']['names'], cmd['mods']['values'])).get('SUFFIX', None)
 
-    # Define memoized function
-    memfn = cache.memoize(
-        fn,
-        key=_key_with_suffix(key, suffix),
-        dump=lambda obj, fname: shutil.move(obj, os.path.join(cache.path, fname)),
-        load=lambda fname: fname,
-    )
+    # Use eager evaluation if specified
+    if 'EAGER' in cmd['mods']['names']:
+        outfile = cache.eval(
+            fn, args, kwargs,
+            digest=key_content,
+            dump=lambda obj, fname: shutil.move(obj, os.path.join(cache.path, fname)),
+        )
 
-    # Run memoized function
-    outfile = memfn(*args, **kwargs)
+    else:
+        # Define memoized function
+        memfn = cache.memoize(
+            fn,
+            key=_key_with_suffix(key, suffix),
+            dump=lambda obj, fname: shutil.move(obj, os.path.join(cache.path, fname)),
+            load=lambda fname: fname,
+        )
+
+        # Run memoized function
+        outfile = memfn(*args, **kwargs)
 
     # Store result in variable if requested
     if cmd['varname']:

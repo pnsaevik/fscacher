@@ -15,10 +15,10 @@ human-readable naming scheme for cached files.
 * Re-use precomputed results
 * Define variables in makefile
 * Specify suffix to be appended to file names
+* Rename results according to contents of results (eager evaluation)
+* (not implemented) Convert commands to job arrays
 * (not implemented) Auto-serialization for commands that returns objects
 * (not implemented) Deserialization of command arguments
-* (not implemented) Rename results according to contents of results (eager evaluation)
-* (not implemented) Convert commands to job arrays
 
 ## Command line usage
 

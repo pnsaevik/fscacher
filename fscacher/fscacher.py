@@ -10,7 +10,9 @@ class Cache:
         self.defaults = dict(
             key=key or _default_key,
             digest=_default_digest,
-        )
+            dump=_default_dump,
+            load=_default_load,
+        )  # type: dict
 
     def __contains__(self, item):
         return self.path.joinpath(str(item)).exists()
@@ -31,6 +33,26 @@ class Cache:
 
         cached_func.key = lambda *args, **kwargs: key(func, args, kwargs)
         return cached_func
+
+    def eval(self, func, args, kwargs, digest='default', dump='default', protocol=None):
+
+        key, dump, load, digest = self._interpret_options(
+            'default', dump, 'default', digest, protocol)
+
+        result = func(*args, **kwargs)
+        k = digest(func, result)
+        path = self.path.joinpath(k)
+
+        try:
+            if path.exists():
+                path.unlink()
+
+            dump(result, path)
+
+        except IOError:
+            pass
+
+        return path
 
     def _interpret_options(self, key, dump, load, digest, protocol):
         funcs = self.defaults.copy()
@@ -93,5 +115,21 @@ def sha256(s: str, bits=256):
     return hasher.digest().hex()[:bits // 4]
 
 
-def _default_digest(key: str):
-    return sha256(key, 64)
+def _default_digest(func, result):
+    import pickle
+    buf = pickle.dumps(result, 4)
+    hasher = hashlib.sha256()
+    hasher.update(buf)
+    return func.__name__ + " " + hasher.digest().hex()
+
+
+def _default_dump(obj, path):
+    import pickle
+    with open(path, 'bw') as fp:
+        pickle.dump(obj, fp, 4)
+
+
+def _default_load(path):
+    import pickle
+    with open(path, 'br') as fp:
+        return pickle.load(fp)

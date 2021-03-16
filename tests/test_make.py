@@ -52,6 +52,15 @@ class Test_make:
             outfile = next(f for f in fnames if f != in_file)
             assert outfile.endswith('.json')
 
+    def test_executes_eager_functions_repeatedly_and_use_content_based_names(self):
+        from fscacher.keygen import sha256
+        in_file = 'makefile_eager.txt'
+        with runmake(in_file) as outdir:
+            fnames = os.listdir(outdir)
+            assert 'increment ' + sha256('[1]') in fnames
+            assert 'increment ' + sha256('[2]') in fnames
+            assert 'increment ' + sha256('[3]') in fnames
+
 
 class Test_parse_makeline:
     def test_finds_funcname_when_args(self):
